@@ -19,24 +19,22 @@ def reserve_seat(args_dict):
     seatNum = args_dict['seatNum']
     startTime = args_dict['startTime']
     endTime = args_dict['endTime']
-    main_try_times = 4
+    main_try_times = 0
     #  chaoxing = util.CX(username, password)
-    #  time.sleep(9)
     print("开始抢座")
     try:
-        for i in range(10):
-            print("第" + str(i + 1) + "次尝试")
-            if main_try_times > 0:
-                if chaoxing_object.submit(roomId=roomId, seatNum=seatNum, day=time.strftime("%Y-%m-%d"),
-                                          startTime=startTime,
-                                          endTime=endTime):
-                    print("预约成功")
-                    break
-                else:
-                    main_try_times = main_try_times - 1
-                    time.sleep(0.2)
-            else:
-                pass  # 这里是抢不到随机的函数
+        while main_try_times < 3:
+            print(datetime.now())
+            main_try_times = main_try_times + 1
+            print("第" + str(main_try_times) + "次尝试")
+            status = chaoxing_object.submit(roomId=roomId, seatNum=seatNum, day=time.strftime("%Y-%m-%d"),
+                                            startTime=startTime,
+                                            endTime=endTime)
+            if status == "成功":
+                print("预约成功")
+                break
+            elif status == "被占用":
+                print("被占用")
 
 
     except Exception as e:
@@ -58,6 +56,7 @@ def reserve_mutil_time(username, password, roomId, seatNum, startTime, endTime):
         args['startTime'] = each_time[0]
         args['endTime'] = each_time[1]
         args_list.append(args)
+    time.sleep(9)
 
     pool = ThreadPool()
     pool.map(reserve_seat, args_list)
@@ -70,12 +69,13 @@ def startJobs(openid, start_reserve_time, username, password, roomId, seatNum, s
     start_reserve_time = parser.parse(start_reserve_time)
     start_reserve_time = start_reserve_time + timedelta(seconds=-10)
     start_reserve_time = start_reserve_time.strftime("%H:%M:%S")
+    #  print(start_reserve_time)
     config.update_pid(openid, os.getpid())
     hour = start_reserve_time.split(':')[0]
     min = start_reserve_time.split(':')[1]
     sec = start_reserve_time.split(':')[2]
     scheduler = BlockingScheduler(timezone='Asia/Shanghai')
-    scheduler.add_job(reserve_seat, 'cron', hour=hour, minute=min, second=sec,
+    scheduler.add_job(reserve_mutil_time, 'cron', hour=hour, minute=min, second=sec,
                       args=[username, password, roomId, seatNum, startTime, endTime])
     scheduler.start()
 
@@ -89,5 +89,6 @@ def startReserve(openid):
     startJobs(openid=openid, start_reserve_time=config['start_reserve_time'], username=config['username'],
               password=config['passwd'], roomId=config['roomId'], seatNum=config['seatNum'],
               startTime=config['startTime'], endTime=config['endTime'])
+
 
 startReserve(sys.argv[1])

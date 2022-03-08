@@ -4,11 +4,56 @@ import util
 import psutil
 
 
+def get_info(openid):
+    #   try:
+    file_name = "config/" + str(openid) + ".json"
+    with open(file_name, "r+", encoding='utf-8') as jsonFile:
+        data = json.load(jsonFile)
+    jsonFile.close()
+    config = data
+    username = config["username"]
+    password = config["passwd"]
+
+    start_reserve_time = config["start_reserve_time"]
+    roomId = config["roomId"]
+    seatNum = config["seatNum"]
+    startTime = config["startTime"]
+    endTime = config["endTime"]
+    pid_status = '有效'
+    if verifyPid(openid):
+        pid_status = '无效'
+    chaoxing = util.CX(username, password)
+    room_dict = chaoxing.get_all_room_and_seat()
+    room_name = room_dict[int(roomId)]
+    msg = '您的账号：' + str(username) + '\n' + '您的抢座时间：' + start_reserve_time + '\n' + '您的位置：' + room_name + '  ' + seatNum + ' 号\n' + '该场馆的开放时间：' + startTime + ' 至 ' + endTime + ' （注意：该时间段由您自己设置！）\n' + '您的抢座进程：' + pid_status
+    return msg
+
+
+#  except Exception:
+#    return "出错了！"
+
+
 def get_pid(openid):
     file_name = "config/" + openid + ".json"
     with open(file_name) as config_file:
         config = json.load(config_file)
+    config_file.close()
     return config['pid']
+
+
+def get_all_room_and_seat(openid):
+    file_name = "config/" + openid + ".json"
+    with open(file_name) as config_file:
+        config = json.load(config_file)
+    config_file.close()
+    username = config['username']
+    password = config['passwd']
+    msg = ''
+    chaoxing = util.CX(username, password)
+    all_room_and_seat = chaoxing.get_all_room_and_seat()
+    for k in all_room_and_seat.keys():
+        msg = msg + str(k) + '   ' + all_room_and_seat[k] + '\n'
+    return msg
 
 
 def check_before_update(openid):
@@ -123,7 +168,7 @@ def sign(openid):
 
 
 def verifyPid(openid):
-    file_name = "config/" + openid + ".json"
+    file_name = "config/" + str(openid) + ".json"
     with open(file_name) as config_file:
         config = json.load(config_file)
     config_file.close()

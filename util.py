@@ -16,6 +16,7 @@ class CX:
         self.recent_roomId = None
         self.acc = phonenums
         self.pwd = password
+        self.all_room_and_seat = {}
         self.mappid = None
         self.incode = None
         self.deptIdEnc = "e23eb03ef41afd60"
@@ -43,7 +44,6 @@ class CX:
             '7': '已取消',
         }
       #  self.get_fidEnc()  # 第二步 必须
-    #    self.seat_info = self.get_seat_reservation_info()
 
     # 获取cookies
     def login(self):
@@ -171,9 +171,26 @@ class CX:
             return str(s) + "秒"
         return "0秒"
 
+    def get_submit_token(self, roomId, seatNum, day, startTime, endTime):
+        response = self.session.get(url='https://office.chaoxing.com/front/apps/seat/list?'
+                                        f'deptIdEnc={self.deptIdEnc}')
+        pageToken = re.compile(r"&pageToken=' \+ '(.*)' \+ '&").findall(response.text)[0]
+        # print(pageToken)
+        response = self.session.get(url='https://office.chaoxing.com/front/apps/seat/select?'
+                                        f'id={roomId}&'  # 房间id roomId 可以从self.room_id_name获取 请自行发挥
+                                        f'day={day}&'  # 预约时间 上下需保持一致 2022-03-06
+                                        'backLevel=2&'  # 必须的参数2
+                                        f'pageToken={pageToken}')
+        try:
+            token = re.compile("token: '(.*)'").findall(response.text)[0]
+            return token
+        except Exception:
+            self.get_submit_token(roomId, seatNum, day, startTime, endTime)
+
     # 预约座位 需要自己修改
     def submit(self, roomId, seatNum, day, startTime, endTime):
         # 获取token
+        '''
         response = self.session.get(url='https://office.chaoxing.com/front/apps/seat/list?'
                                         f'deptIdEnc={self.deptIdEnc}')
         pageToken = re.compile(r"&pageToken=' \+ '(.*)' \+ '&").findall(response.text)[0]
@@ -184,6 +201,8 @@ class CX:
                                         'backLevel=2&'  # 必须的参数2
                                         f'pageToken={pageToken}')
         token = re.compile("token: '(.*)'").findall(response.text)[0]
+        '''
+        token = self.get_submit_token(roomId, seatNum, day, startTime, endTime)
         # print(token)
         response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/submit?'
                                         f'roomId={roomId}&'  # 房间id roomId 上下需保持一致
@@ -195,8 +214,9 @@ class CX:
         seat_result = response.json()
         print(seat_result)
         if seat_result['success']:
-            print("成功")
-            return True
+            return "成功"
+        elif seat_result['msg'] == '该时间段已被占用！':
+            return "被占用"
         else:
             return False
 
@@ -219,8 +239,10 @@ class CX:
             response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/seatgrid/roomid?'
                                             'roomId={}'.format(index['id']))
             self.all_seat += response.json()['data']['seatDatas']
-            print(index['id'],  index['firstLevelName'], index['secondLevelName'],
-                  index['thirdLevelName'] + ' 能承载' + str(index['capacity']) + '人')
+            self.all_room_and_seat[index['id']] = index['firstLevelName']+index['secondLevelName']+index['thirdLevelName']
+        return self.all_room_and_seat
+         #   print(index['id'],  index['firstLevelName'], index['secondLevelName'],
+              #    index['thirdLevelName'] + ' 能承载' + str(index['capacity']) + '人')
 
     # 获取学习人数分布 多线程 2000座约10s
     def get_study_info(self):
