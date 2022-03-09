@@ -67,7 +67,7 @@ class CX:
     # 身份获取 官方的接口 自行研究
     def get_role(self):
         role = self.session.get(url='https://office.chaoxing.com/data/apps/seat/person/role').json()
-        # print(role)
+       # print(role)
         try:
             for index in role['data']['roleList']['data']:
                 if role['data']['roleListSelf'][0]['roleId'] == index['roleid']:
@@ -131,9 +131,12 @@ class CX:
 
     # 签到
     def sign(self):
-        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/sign?'
-                                        f'id={self.get_my_seat_id()}')
-        print(response.json())
+        my_current_seat_list = self.get_my_current_seat_id()
+        for i in my_current_seat_list:
+            response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/sign?'
+                                            f'id={i["id"]}')
+            time.sleep(1)
+            print(response.json())
 
     # 暂离
     def leave(self):
@@ -302,3 +305,8 @@ class CX:
                                         'pageSize=100&'
                                         'type=-1').json()['data']['reserveList']
         return response[0]['id']
+
+
+    def get_my_current_seat_id(self):
+        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/index').json()
+        return response['data']['curReserves']

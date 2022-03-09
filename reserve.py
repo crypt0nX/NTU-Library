@@ -10,7 +10,6 @@ from dateutil import parser
 from datetime import datetime, timedelta
 import split_time
 
-args = {"username": "", "password": "", "roomId": "", "seatNum": "", "startTime": "", "endTime": ""}
 
 
 def reserve_seat(args_dict):
@@ -43,11 +42,12 @@ def reserve_seat(args_dict):
 
 def reserve_mutil_time(username, password, roomId, seatNum, startTime, endTime):
     time_list = split_time.split_time_ranges(startTime, endTime, 60 * 60 * 6)
-    args_list = []
     chaoxing = util.CX(username, password)
 
+    args_list = []
     for each_time in time_list:
         print(each_time)
+        args = {"username": "", "password": "", "roomId": "", "seatNum": "", "startTime": "", "endTime": ""}
         args['chaoxing_object'] = chaoxing
         args['username'] = username
         args['password'] = password
@@ -91,4 +91,5 @@ def startReserve(openid):
               startTime=config['startTime'], endTime=config['endTime'])
 
 
+#startReserve("test")
 startReserve(sys.argv[1])
