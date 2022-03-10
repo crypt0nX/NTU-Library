@@ -7,7 +7,7 @@ import time
 from lxml import etree
 import threading
 import queue
-
+import datetime
 
 class CX:
     # 实例化请传入手机号和密码
@@ -191,7 +191,7 @@ class CX:
             self.get_submit_token(roomId, seatNum, day, startTime, endTime)
 
     # 预约座位 需要自己修改
-    def submit(self, roomId, seatNum, day, startTime, endTime):
+    def submit(self, roomId, seatNum, day, startTime, endTime, try_times):
         # 获取token
         '''
         response = self.session.get(url='https://office.chaoxing.com/front/apps/seat/list?'
@@ -215,7 +215,8 @@ class CX:
                                         f'seatNum={seatNum}&'  # 座位数字 与桌上贴纸一致
                                         f'token={token}')
         seat_result = response.json()
-        print(seat_result)
+        print(str(datetime.datetime.now()) + '  ' + str(self.acc) + str(seat_result) + '  第' + str(try_times) + '次')
+    #    print(seat_result)
         if seat_result['success']:
             return "成功"
         elif seat_result['msg'] == '该时间段已被占用！':

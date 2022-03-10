@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 import split_time
 
 
-
 def reserve_seat(args_dict):
     chaoxing_object = args_dict['chaoxing_object']
     roomId = args_dict['roomId']
@@ -23,12 +22,12 @@ def reserve_seat(args_dict):
     print("开始抢座")
     try:
         while main_try_times < 3:
-            print(datetime.now())
+          #  print(datetime.now())
             main_try_times = main_try_times + 1
-            print("第" + str(main_try_times) + "次尝试")
+        #    print(args_dict['username'] + '  ' + str(datetime.now()) + "  " + "第" + str(main_try_times) + "次尝试")
             status = chaoxing_object.submit(roomId=roomId, seatNum=seatNum, day=time.strftime("%Y-%m-%d"),
                                             startTime=startTime,
-                                            endTime=endTime)
+                                            endTime=endTime, try_times=main_try_times)
             if status == "成功":
                 print("预约成功")
                 break
@@ -91,5 +90,4 @@ def startReserve(openid):
               startTime=config['startTime'], endTime=config['endTime'])
 
 
-#startReserve("test")
 startReserve(sys.argv[1])

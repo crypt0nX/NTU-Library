@@ -185,4 +185,4 @@ def verifyPid(openid):
             print(e)
             return True
     else:
-        return False
+        return True
