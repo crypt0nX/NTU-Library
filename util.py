@@ -215,7 +215,7 @@ class CX:
                                         f'seatNum={seatNum}&'  # 座位数字 与桌上贴纸一致
                                         f'token={token}')
         seat_result = response.json()
-        print(str(datetime.datetime.now()) + '  ' + str(self.acc) + str(seat_result) + '  第' + str(try_times) + '次')
+        print(str(datetime.datetime.now()) + '  ' + str(self.acc) + ' ' + str(seat_result) + '  第' + str(try_times) + '次')
     #    print(seat_result)
         if seat_result['success']:
             return "成功"

@@ -22,9 +22,9 @@ def reserve_seat(args_dict):
     print("开始抢座")
     try:
         while main_try_times < 3:
-          #  print(datetime.now())
+            #  print(datetime.now())
             main_try_times = main_try_times + 1
-        #    print(args_dict['username'] + '  ' + str(datetime.now()) + "  " + "第" + str(main_try_times) + "次尝试")
+            #    print(args_dict['username'] + '  ' + str(datetime.now()) + "  " + "第" + str(main_try_times) + "次尝试")
             status = chaoxing_object.submit(roomId=roomId, seatNum=seatNum, day=time.strftime("%Y-%m-%d"),
                                             startTime=startTime,
                                             endTime=endTime, try_times=main_try_times)
@@ -44,7 +44,7 @@ def reserve_mutil_time(username, password, roomId, seatNum, startTime, endTime):
     chaoxing = util.CX(username, password)
 
     args_list = []
-    for each_time in time_list:
+    for each_time in time_list[:2]:
         print(each_time)
         args = {"username": "", "password": "", "roomId": "", "seatNum": "", "startTime": "", "endTime": ""}
         args['chaoxing_object'] = chaoxing
