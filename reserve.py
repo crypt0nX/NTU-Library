@@ -18,10 +18,11 @@ def reserve_seat(args_dict):
     startTime = args_dict['startTime']
     endTime = args_dict['endTime']
     main_try_times = 0
-    #  chaoxing = util.CX(username, password)
     print("开始抢座")
     try:
-        while main_try_times < 3:
+        while main_try_times < 10:
+            if main_try_times > 5:
+                time.sleep(0.2)
             #  print(datetime.now())
             main_try_times = main_try_times + 1
             #    print(args_dict['username'] + '  ' + str(datetime.now()) + "  " + "第" + str(main_try_times) + "次尝试")
