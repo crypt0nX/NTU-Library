@@ -20,8 +20,8 @@ def reserve_seat(args_dict):
     main_try_times = 0
     print("开始抢座")
     try:
-        while main_try_times < 10:
-            if main_try_times > 5:
+        while main_try_times < 15:
+            if main_try_times > 10:
                 time.sleep(0.2)
             #  print(datetime.now())
             main_try_times = main_try_times + 1
@@ -56,7 +56,7 @@ def reserve_mutil_time(username, password, roomId, seatNum, startTime, endTime):
         args['startTime'] = each_time[0]
         args['endTime'] = each_time[1]
         args_list.append(args)
-    time.sleep(9)
+    time.sleep(8)
 
     pool = ThreadPool()
     pool.map(reserve_seat, args_list)
