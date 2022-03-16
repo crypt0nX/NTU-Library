@@ -2,6 +2,7 @@ import json
 import os
 import util
 import psutil
+import time
 
 
 def get_info(openid):
@@ -25,7 +26,8 @@ def get_info(openid):
     chaoxing = util.CX(username, password)
     room_dict = chaoxing.get_all_room_and_seat()
     room_name = room_dict[int(roomId)]
-    msg = '您的账号：' + str(username) + '\n' + '您的抢座时间：' + start_reserve_time + '\n' + '您的位置：' + room_name + '  ' + seatNum + ' 号\n' + '该场馆的开放时间：' + startTime + ' 至 ' + endTime + ' （注意：该时间段由您自己设置！）\n' + '您的抢座进程：' + pid_status
+    msg = '您的账号：' + str(
+        username) + '\n' + '您的抢座时间：' + start_reserve_time + '\n' + '您的位置：' + room_name + '  ' + seatNum + ' 号\n' + '该场馆的开放时间：' + startTime + ' 至 ' + endTime + ' （注意：该时间段由您自己设置！）\n' + '您的抢座进程：' + pid_status
     return msg
 
 
@@ -165,6 +167,9 @@ def sign(openid):
     password = config['passwd']
     chaoxing = util.CX(username, password)
     chaoxing.sign()
+
+
+
 
 
 def verifyPid(openid):

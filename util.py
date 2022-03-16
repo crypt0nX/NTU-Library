@@ -9,6 +9,7 @@ import threading
 import queue
 import datetime
 
+
 class CX:
     # 实例化请传入手机号和密码
     def __init__(self, phonenums, password):
@@ -43,7 +44,8 @@ class CX:
             '5': '被监督中',
             '7': '已取消',
         }
-      #  self.get_fidEnc()  # 第二步 必须
+
+    #  self.get_fidEnc()  # 第二步 必须
 
     # 获取cookies
     def login(self):
@@ -63,11 +65,10 @@ class CX:
         s_url = 'https://office.chaoxing.com/front/third/apps/seat/index'
         self.session.get(s_url).text
 
-
     # 身份获取 官方的接口 自行研究
     def get_role(self):
         role = self.session.get(url='https://office.chaoxing.com/data/apps/seat/person/role').json()
-       # print(role)
+        # print(role)
         try:
             for index in role['data']['roleList']['data']:
                 if role['data']['roleListSelf'][0]['roleId'] == index['roleid']:
@@ -215,8 +216,9 @@ class CX:
                                         f'seatNum={seatNum}&'  # 座位数字 与桌上贴纸一致
                                         f'token={token}')
         seat_result = response.json()
-        print(str(datetime.datetime.now()) + '  ' + str(self.acc) + ' ' + str(seat_result) + '  第' + str(try_times) + '次')
-    #    print(seat_result)
+        print(
+            str(datetime.datetime.now()) + '  ' + str(self.acc) + ' ' + str(seat_result) + '  第' + str(try_times) + '次')
+        #    print(seat_result)
         if seat_result['success']:
             return "成功"
         elif seat_result['msg'] == '该时间段已被占用！':
@@ -243,10 +245,11 @@ class CX:
             response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/seatgrid/roomid?'
                                             'roomId={}'.format(index['id']))
             self.all_seat += response.json()['data']['seatDatas']
-            self.all_room_and_seat[index['id']] = index['firstLevelName']+index['secondLevelName']+index['thirdLevelName']
+            self.all_room_and_seat[index['id']] = index['firstLevelName'] + index['secondLevelName'] + index[
+                'thirdLevelName']
         return self.all_room_and_seat
-         #   print(index['id'],  index['firstLevelName'], index['secondLevelName'],
-              #    index['thirdLevelName'] + ' 能承载' + str(index['capacity']) + '人')
+        #   print(index['id'],  index['firstLevelName'], index['secondLevelName'],
+        #    index['thirdLevelName'] + ' 能承载' + str(index['capacity']) + '人')
 
     # 获取学习人数分布 多线程 2000座约10s
     def get_study_info(self):
@@ -307,7 +310,20 @@ class CX:
                                         'type=-1').json()['data']['reserveList']
         return response[0]['id']
 
-
     def get_my_current_seat_id(self):
         response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/index').json()
         return response['data']['curReserves']
+
+    def get_supervision_status(self):
+        try:
+            response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/index').json()
+       #     print(response['data']['curReserves'])
+            supervision_status = response['data']['curReserves'][0]['status']
+            if str(supervision_status) == "5":
+                return True
+        except Exception:
+            return False
+
+
+
+

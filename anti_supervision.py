@@ -1,0 +1,26 @@
+import json
+import util
+import time
+import sys
+import datetime
+
+
+def anti_supervision(openid):
+    file_name = "config/" + openid + ".json"
+    with open(file_name) as config_file:
+        config = json.load(config_file)
+    config_file.close()
+    username = config['username']
+    password = config['passwd']
+    chaoxing = util.CX(username, password)
+    count = 1
+    while count <= 60:
+        print(str(datetime.datetime.now()) + " " + str(username) + " 正在检查进程 " + "第" + str(count) + "次")
+        if chaoxing.get_supervision_status():
+            print(str(datetime.datetime.now()) + " " + str(username) + "发现被举报！，正在尝试签到")
+            chaoxing.sign()
+        time.sleep(60)
+        count = count + 1
+
+
+anti_supervision(sys.argv[1])
