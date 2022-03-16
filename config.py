@@ -6,6 +6,7 @@ import time
 
 
 def get_info(openid):
+    check_before_update(openid)
     #   try:
     file_name = "config/" + str(openid) + ".json"
     with open(file_name, "r+", encoding='utf-8') as jsonFile:
@@ -21,13 +22,16 @@ def get_info(openid):
     startTime = config["startTime"]
     endTime = config["endTime"]
     pid_status = '有效'
+    anti_supervision_pid_status = '开启'
     if verifyPid(openid):
         pid_status = '无效'
+    if verify_anti_supervision_Pid(openid):
+        anti_supervision_pid_status = '关闭'
     chaoxing = util.CX(username, password)
     room_dict = chaoxing.get_all_room_and_seat()
     room_name = room_dict[int(roomId)]
     msg = '您的账号：' + str(
-        username) + '\n' + '您的抢座时间：' + start_reserve_time + '\n' + '您的位置：' + room_name + '  ' + seatNum + ' 号\n' + '该场馆的开放时间：' + startTime + ' 至 ' + endTime + ' （注意：该时间段由您自己设置！）\n' + '您的抢座进程：' + pid_status
+        username) + '\n' + '您的抢座时间：' + start_reserve_time + '\n' + '您的位置：' + room_name + '  ' + seatNum + ' 号\n' + '该场馆的开放时间：' + startTime + ' 至 ' + endTime + ' （注意：该时间段由您自己设置！）\n' + '您的抢座进程：' + pid_status + '\n您的反举报状态：' + anti_supervision_pid_status
     return msg
 
 
@@ -41,6 +45,13 @@ def get_pid(openid):
         config = json.load(config_file)
     config_file.close()
     return config['pid']
+
+def get_anti_supervision_pid(openid):
+    file_name = "config/" + openid + ".json"
+    with open(file_name) as config_file:
+        config = json.load(config_file)
+    config_file.close()
+    return config['anti_supervision_pid']
 
 
 def get_all_room_and_seat(openid):
@@ -62,7 +73,7 @@ def check_before_update(openid):
     file_name = "config/" + openid + ".json"
     example_data = {"openid": "user_config_example", "start_reserve_time": "07:00:00", "username": "", "passwd": "",
                     "roomId": "", "seatNum": "",
-                    "startTime": "", "endTime": "", "pid": ""}
+                    "startTime": "", "endTime": "", "pid": "", "anti_supervision_pid": ""}
     if not os.path.exists(file_name):
         print("文件不存在")
         with open(file_name, "w") as jsonFile:
@@ -146,6 +157,18 @@ def update_pid(openid, pid):
     jsonFile.close()
 
 
+def update_anti_supervision_pid(openid, pid):
+    check_before_update(openid)
+    file_name = "config/" + openid + ".json"
+    with open(file_name, "r+", encoding='utf-8') as jsonFile:
+        data = json.load(jsonFile)
+    jsonFile.close()
+    data["anti_supervision_pid"] = pid
+    with open(file_name, "w") as jsonFile:
+        json.dump(data, jsonFile, ensure_ascii=False)
+    jsonFile.close()
+
+
 def update_reserve_time(openid, reserve_time):
     check_before_update(openid)
     file_name = "config/" + openid + ".json"
@@ -169,9 +192,6 @@ def sign(openid):
     chaoxing.sign()
 
 
-
-
-
 def verifyPid(openid):
     file_name = "config/" + str(openid) + ".json"
     with open(file_name) as config_file:
@@ -191,3 +211,27 @@ def verifyPid(openid):
             return True
     else:
         return True
+
+def verify_anti_supervision_Pid(openid):
+    try:
+        file_name = "config/" + str(openid) + ".json"
+        with open(file_name) as config_file:
+            config = json.load(config_file)
+        config_file.close()
+        pid = config['anti_supervision_pid']
+        if pid:
+            try:
+                s = psutil.Process(pid)
+                if s.status() == "sleeping":
+                    print(s.status())
+                    return False
+                else:
+                    return True
+            except Exception as e:
+                print(e)
+                return True
+        else:
+            return True
+    except Exception:
+        return True
+
