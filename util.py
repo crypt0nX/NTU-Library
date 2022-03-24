@@ -233,7 +233,7 @@ class CX:
 
     # 获取图书馆所有的房间和房间
     def get_all_room_and_seat(self):
-        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/room/list?'
+        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/room/list?cpage=1&pageSize=100?'
                                         f'deptIdEnc={self.deptIdEnc}')
         self.room = response.json()['data']['seatRoomList']
         self.deptId = self.room[0]['deptId']
