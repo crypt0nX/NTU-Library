@@ -1,5 +1,5 @@
 #!/usr/bin/python3.7.0
-# -*- coding: utf-8 -*-
+#.text -*- coding: utf-8 -*-
 import requests
 import base64
 import re
@@ -233,8 +233,9 @@ class CX:
 
     # 获取图书馆所有的房间和房间
     def get_all_room_and_seat(self):
-        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/room/list?cpage=1&pageSize=100?'
+        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/room/list?cpage=1&pageSize=100&'
                                         f'deptIdEnc={self.deptIdEnc}')
+        print(response.text)
         self.room = response.json()['data']['seatRoomList']
         self.deptId = self.room[0]['deptId']
         for index in self.room:

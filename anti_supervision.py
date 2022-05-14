@@ -17,7 +17,7 @@ def anti_supervision(openid):
     password = config['passwd']
     chaoxing = util.CX(username, password)
     count = 1
-    while count <= 120:
+    while count <= 40:
         print(str(datetime.datetime.now()) + " " + str(username) + " 正在检查进程 " + "第" + str(count) + "次")
         if chaoxing.get_supervision_status():
             print(str(datetime.datetime.now()) + " " + str(username) + "发现被举报！，正在尝试签到")

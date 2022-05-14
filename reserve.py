@@ -56,7 +56,7 @@ def reserve_mutil_time(username, password, roomId, seatNum, startTime, endTime):
         args['startTime'] = each_time[0]
         args['endTime'] = each_time[1]
         args_list.append(args)
-    time.sleep(8)
+    time.sleep(9)
 
     pool = ThreadPool()
     pool.map(reserve_seat, args_list)
