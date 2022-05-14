@@ -31,7 +31,7 @@ def get_info(openid):
     room_dict = chaoxing.get_all_room_and_seat()
     room_name = room_dict[int(roomId)]
     msg = '您的账号：' + str(
-        username) + '\n' + '您的抢座时间：' + start_reserve_time + '\n' + '您的位置：' + room_name + '  ' + seatNum + ' 号\n' + '该场馆的开放时间：' + startTime + ' 至 ' + endTime + ' （注意：该时间段由您自己设置！）\n' + '您的抢座进程：' + pid_status + '\n您的反举报状态：' + anti_supervision_pid_status
+        username) + '\n' + '您的抢座时间：' + start_reserve_time + '\n' + '您的位置：' + room_name + '  ' + seatNum + ' 号\n' + '该场馆的开放时间：' + startTime + ' 至 ' + endTime + ' （注意：该时间段由您自己设置！）\n' + '您的抢座进程：' + pid_status + '\n您的反举报状态：' + anti_supervision_pid_status + "\n推荐添加我的微信，后续方便通知公众号相关动态😎"
     return msg
 
 
