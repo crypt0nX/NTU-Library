@@ -49,7 +49,7 @@ class CX:
 
     # 获取cookies
     def login(self):
-
+        '''
         c_url = 'https://passport2.chaoxing.com/mlogin?loginType=1&newversion=true&fid=&refer=https://office.chaoxing' \
                 '.com/front/third/apps/seat/index?fidEnc=e23eb03ef41afd60&uid=220119568&mappId=6120199&code=77h1nWKP' \
                 '&state=30295 '
@@ -61,9 +61,15 @@ class CX:
             'refer': 'http%3A%2F%2Foffice.chaoxing.com%2Ffront%2Fthird%2Fapps%2Fseat%2Findex',
             't': 'true'
         }
-        self.session.post('https://passport2.chaoxing.com/fanyalogin', data=data)
+
+     #   tmp = self.session.post('https://passport2.chaoxing.com/fanyalogin', data=data)
+     #   print(tmp.text)
         s_url = 'https://office.chaoxing.com/front/third/apps/seat/index'
         self.session.get(s_url).text
+    '''
+
+        new_url = f'https://passport2-api.chaoxing.com/v11/loginregister?code={self.pwd}&cx_xxt_passport=json&uname={self.acc}&loginType=1&roleSelect=true'
+        self.session.get(new_url)
 
     # 身份获取 官方的接口 自行研究
     def get_role(self):
