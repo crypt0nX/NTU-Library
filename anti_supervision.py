@@ -1,5 +1,5 @@
 import json
-import util
+import utils.core as core
 import time
 import sys
 import datetime
@@ -15,7 +15,7 @@ def anti_supervision(openid):
     config_file.close()
     username = config['username']
     password = config['passwd']
-    chaoxing = util.CX(username, password)
+    chaoxing = core.CX(username, password)
     count = 1
     while count <= 40:
         print(str(datetime.datetime.now()) + " " + str(username) + " 正在检查进程 " + "第" + str(count) + "次")

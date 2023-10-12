@@ -1,6 +1,6 @@
 import json
 import os
-import util
+import utils.core as core
 import psutil
 import time
 
@@ -27,7 +27,7 @@ def get_info(openid):
         pid_status = '无效'
     if verify_anti_supervision_Pid(openid):
         anti_supervision_pid_status = '关闭'
-    chaoxing = util.CX(username, password)
+    chaoxing = core.CX(username, password)
     room_dict = chaoxing.get_all_room_and_seat()
     room_name = room_dict[int(roomId)]
     msg = '您的账号：' + str(
@@ -62,7 +62,7 @@ def get_all_room_and_seat(openid):
     username = config['username']
     password = config['passwd']
     msg = ''
-    chaoxing = util.CX(username, password)
+    chaoxing = core.CX(username, password)
     all_room_and_seat = chaoxing.get_all_room_and_seat()
     for k in all_room_and_seat.keys():
         msg = msg + str(k) + '   ' + all_room_and_seat[k] + '\n'
@@ -188,7 +188,7 @@ def sign(openid):
     config_file.close()
     username = config['username']
     password = config['passwd']
-    chaoxing = util.CX(username, password)
+    chaoxing = core.CX(username, password)
     chaoxing.sign()
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-import util.hitokoto as hitokoto
+import utils.hitokoto as hitokoto
 import subprocess
 from flask import Flask, request, abort, render_template
 from wechatpy import parse_message, create_reply
@@ -11,9 +11,9 @@ from wechatpy.exceptions import (
 )
 
 # set token or get from environments
-import config
+import utils.config as config
 import time
-import check_if_banned
+import utils.check_if_banned as check_if_banned
 
 APPSERECT = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 TOKEN = os.getenv("WECHAT_TOKEN", "XXXXXXXXXXXX")

@@ -1,7 +1,7 @@
 #!/usr/bin/python3.7.0
 # .text -*- coding: utf-8 -*-
 import requests
-from util.encrypt import AES_Encrypt
+from utils.encrypt import AES_Encrypt
 import re
 import time
 from lxml import etree
@@ -218,7 +218,7 @@ class CX:
             self.get_submit_token(roomId, seatNum, day, startTime, endTime)
 
     def getEnc(self, roomId, day, starttime, endtime, seatNum, token):
-        with open("util/encode.js", "r+") as f:
+        with open("utils/encode.js", "r+") as f:
             js_code = f.read()
         parm_dict = {"roomIdparm": roomId,
                      "dayparm": day,
@@ -264,8 +264,7 @@ class CX:
             "enc": enc
         }
 
-        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/submit', params=params,
-                                    proxies={'https': 'http://127.0.0.1:8080'}, verify=False)
+        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/submit', params=params, verify=False)
 
         seat_result = response.json()
         print(

@@ -1,5 +1,5 @@
 def check(openid):
-    with open("banned") as file:
+    with open("utils/banned") as file:
         file = file.readlines()
         file = [i.strip('\n') for i in file]
     if openid in file:

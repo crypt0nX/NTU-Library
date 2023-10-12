@@ -1,14 +1,14 @@
 import json
 import time
-import util.core as core
+import utils.core as core
 from apscheduler.schedulers.blocking import BlockingScheduler
 import os
 from multiprocessing.dummy import Pool as ThreadPool
-import util.config as config
+import utils.config as config
 import sys
 from dateutil import parser
 from datetime import datetime, timedelta
-import util.split_time as split_time
+import utils.split_time as split_time
 
 
 def reserve_seat(args_dict):
