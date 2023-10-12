@@ -1,13 +1,14 @@
 #!/usr/bin/python3.7.0
-#.text -*- coding: utf-8 -*-
+# .text -*- coding: utf-8 -*-
 import requests
-import base64
+from util.encrypt import AES_Encrypt
 import re
 import time
 from lxml import etree
 import threading
 import queue
 import datetime
+import js2py
 
 
 class CX:
@@ -17,6 +18,7 @@ class CX:
         self.recent_roomId = None
         self.acc = phonenums
         self.pwd = password
+        self.login_url = "https://passport2.chaoxing.com/fanyalogin"
         self.all_room_and_seat = {}
         self.mappid = None
         self.incode = None
@@ -48,7 +50,7 @@ class CX:
     #  self.get_fidEnc()  # 第二步 必须
 
     # 获取cookies
-    def login(self):
+    def login_deprected(self):
         '''
         c_url = 'https://passport2.chaoxing.com/mlogin?loginType=1&newversion=true&fid=&refer=https://office.chaoxing' \
                 '.com/front/third/apps/seat/index?fidEnc=e23eb03ef41afd60&uid=220119568&mappId=6120199&code=77h1nWKP' \
@@ -71,6 +73,23 @@ class CX:
         new_url = f'https://passport2-api.chaoxing.com/v11/loginregister?code={self.pwd}&cx_xxt_passport=json&uname={self.acc}&loginType=1&roleSelect=true'
         self.session.get(new_url)
 
+    def login(self):
+        username = AES_Encrypt(self.acc)
+        password = AES_Encrypt(self.pwd)
+        parm = {
+            "fid": -1,
+            "uname": username,
+            "password": password,
+            "refer": "http%3A%2F%2Foffice.chaoxing.com%2Ffront%2Fthird%2Fapps%2Fseat%2Fcode%3Fid%3D4219%26seatNum%3D380",
+            "t": True
+        }
+        jsons = self.session.post(
+            url=self.login_url, params=parm, verify=False)
+        obj = jsons.json()
+        if obj['status']:
+            return True, ''
+        else:
+            return False, obj['msg2']
     # 身份获取 官方的接口 自行研究
     def get_role(self):
         role = self.session.get(url='https://office.chaoxing.com/data/apps/seat/person/role').json()
@@ -192,10 +211,27 @@ class CX:
                                         'backLevel=2&'  # 必须的参数2
                                         f'pageToken={pageToken}')
         try:
-            token = re.compile("token: '(.*)'").findall(response.text)[0]
+            token = re.compile("token\s*=\s*'([a-fA-F0-9]+)',").findall(response.text)[0]
             return token
-        except Exception:
+        except Exception as e:
+            print(e)
             self.get_submit_token(roomId, seatNum, day, startTime, endTime)
+
+    def getEnc(self, roomId, day, starttime, endtime, seatNum, token):
+        with open("util/encode.js", "r+") as f:
+            js_code = f.read()
+        parm_dict = {"roomIdparm": roomId,
+                     "dayparm": day,
+                     "startTimeparm": starttime,
+                     "endTimeparm": endtime,
+                     "seatNumparm": seatNum,
+                     "tokenparm": token}
+        for i in parm_dict:
+            js_code = js_code.replace(i, parm_dict[i])
+        # print(js_code)
+        result = js2py.eval_js(js_code)
+
+        return result
 
     # 预约座位 需要自己修改
     def submit(self, roomId, seatNum, day, startTime, endTime, try_times):
@@ -213,17 +249,28 @@ class CX:
         token = re.compile("token: '(.*)'").findall(response.text)[0]
         '''
         token = self.get_submit_token(roomId, seatNum, day, startTime, endTime)
-        # print(token)
-        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/submit?'
-                                        f'roomId={roomId}&'  # 房间id roomId 上下需保持一致
-                                        f'startTime={startTime}&'  # 开始时间%3A代表: 自行替换9（小时）和后面00（分钟） 必须
-                                        f'endTime={endTime}&'  # 结束时间 规则同上
-                                        f'day={day}&'  # 预约时间 上下需保持一致
-                                        f'seatNum={seatNum}&'  # 座位数字 与桌上贴纸一致
-                                        f'token={token}')
+        enc = self.getEnc(roomId, day, startTime, endTime, seatNum, token)
+
+        params = {
+            "roomId": roomId,
+            "day": str(day),
+            "startTime": startTime,
+            "endTime": endTime,
+            "seatNum": seatNum,
+            "token": token,
+            "captcha": "",
+            "type": 1,
+            "verifyData": 1,
+            "enc": enc
+        }
+
+        response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/submit', params=params,
+                                    proxies={'https': 'http://127.0.0.1:8080'}, verify=False)
+
         seat_result = response.json()
         print(
-            str(datetime.datetime.now()) + '  ' + str(self.acc) + ' ' + str(seat_result) + '  第' + str(try_times) + '次')
+            str(datetime.datetime.now()) + '  ' + str(self.acc) + ' ' + str(seat_result) + '  第' + str(
+                try_times) + '次')
         #    print(seat_result)
         if seat_result['success']:
             return "成功"
@@ -324,13 +371,9 @@ class CX:
     def get_supervision_status(self):
         try:
             response = self.session.get(url='https://office.chaoxing.com/data/apps/seat/index').json()
-       #     print(response['data']['curReserves'])
+            #     print(response['data']['curReserves'])
             supervision_status = response['data']['curReserves'][0]['status']
             if str(supervision_status) == "5":
                 return True
         except Exception:
             return False
-
-
-
-

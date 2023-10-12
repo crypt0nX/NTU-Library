@@ -1,14 +1,14 @@
 import json
 import time
-import util
+import util.core as core
 from apscheduler.schedulers.blocking import BlockingScheduler
 import os
 from multiprocessing.dummy import Pool as ThreadPool
-import config
+import util.config as config
 import sys
 from dateutil import parser
 from datetime import datetime, timedelta
-import split_time
+import util.split_time as split_time
 
 
 def reserve_seat(args_dict):
@@ -42,7 +42,7 @@ def reserve_seat(args_dict):
 
 def reserve_mutil_time(username, password, roomId, seatNum, startTime, endTime):
     time_list = split_time.split_time_ranges(startTime, endTime, 60 * 60 * 6)
-    chaoxing = util.CX(username, password)
+    chaoxing = core.CX(username, password)
 
     args_list = []
     for each_time in time_list[:2]:
